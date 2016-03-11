@@ -1,0 +1,35 @@
+{
+  "name": "vizlint",
+  "version": "0.0.1",
+  "description": ".visual linter",
+  "homepage": "",
+  "author": {
+    "name": "Lonny Gomes",
+    "email": "code@lonnygomes.com",
+    "url": ""
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index.js",
+  "bin": "lib/cli.js",
+  "keywords": [
+    ""
+  ],
+  "dependencies": {
+    "adm-zip": "^0.4.7",
+    "meow": "^3.7.0",
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.0",
+    "gulp-mocha": "^2.0.0",
+    "gulp-plumber": "^1.0.0"
+  },
+  "repository": "lonnygomes/vizlint",
+  "scripts": {
+    "test": "gulp"
+  },
+  "license": "MIT"
+}
