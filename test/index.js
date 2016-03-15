@@ -4,6 +4,7 @@
 
 var expect = require('chai').expect;
 var vizlint = require('../lib');
+var q = require('q');
 var fixtures = {
     noMdPath: 'test/fixtures/sample_no_md',
     sampleBare: 'test/fixtures/sample_bare',
@@ -74,5 +75,59 @@ describe('vizlint', function () {
         });
     });
 
+    describe('lint()', function () {
+        it('should fail if metadata.json is not a valid JSON file', function () {
+            return vizlint.lint(fixtures.invalidMd)
+                .then(function () {
+                    throw new Error('lint should have thrown an error on invalid path');
+                }, function (err) {
+                    //success
+                });
+        });
 
+        it('should fail if metadata.json does not exist', function () {
+            return vizlint.lint(fixtures.invalidMd)
+                .then(function () {
+                    throw new Error('lint should have thrown an error on no metadata.json');
+                }, function (err) {
+                    //success
+                });
+        });
+
+        it('should resolve promise and return an object if metadata was read', function () {
+            return vizlint.lint(fixtures.missingReqMdPath)
+                .then(function (result) {
+                    expect(result).to.include.keys('msg');
+                    expect(result).to.include.keys('errors');
+                });
+        });
+
+        it('should return an array of errors in resolved promise', function () {
+            var tests = [
+                function (md, p) {
+                    var d = q.defer();
+                    d.reject(['fail 1', 'fail 2']);
+                    return d.promise;
+                },
+                function (md, p) {
+                    var d = q.defer();
+                    d.reject(['fail 3']);
+                    return d.promise;
+                },
+                function (md, p) {
+                    var d = q.defer();
+                    d.reject(['fail 4', 'fail 5', 'fail 6']);
+                    return d.promise;
+                }
+            ];
+
+            return vizlint.lint(fixtures.missingReqMdPath, tests)
+                .then(function(result) {
+                    expect(result.errors.length).to.equal(6);
+                    expect(result.errors[0]).to.equal('fail 1');
+                    expect(result.errors[5]).to.equal('fail 6');
+                });
+
+        });
+    });
 });
