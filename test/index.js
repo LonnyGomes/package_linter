@@ -84,6 +84,20 @@ describe('vizlint', function () {
         it('should accept a visual package with a metadata.json file', function () {
             return vizlint.load(fixtures.sampleBarePackage);
         });
+
+        it('should notify when zip extration starts and ends', function () {
+            var progressMgs = [];
+            return vizlint.load(fixtures.sampleBarePackage)
+                .then(function () {
+                    expect(progressMgs.length).to.equal(2);
+                    expect(progressMgs[0]).to.match(/^Started/);
+                    expect(progressMgs[1]).to.match(/^Finished/);
+                }, function (err) {
+                    throw new Error('load method should not have failed');
+                }, function (progress) {
+                    progressMgs.push(progress);
+                });
+        });
     });
 
     describe('lint()', function () {
