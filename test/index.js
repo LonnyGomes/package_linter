@@ -4,6 +4,7 @@
 
 var expect = require('chai').expect;
 var vizlint = require('../lib');
+var coreTests = require('../lib/core-tests');
 var q = require('q');
 var fixtures = {
     noMdPath: 'test/fixtures/sample_no_md',
@@ -12,7 +13,16 @@ var fixtures = {
     noMdPackage: 'test/fixtures/sample_no_md.visual',
     sampleBarePackage: 'test/fixtures/sample_bare.visual',
     invalidMd: 'test/fixtures/sample_bare/metadata.json',
-    missingReqMdPath: 'test/fixtures/sample_missing'
+    missingReqMdPath: 'test/fixtures/sample_missing',
+    typeNoPath: 'test/fixtures/type/type_missing',
+    typeInvalidPath: 'test/fixtures/type/type_invalid',
+    typeStaticPath: 'test/fixtures/type/type_static',
+    typeIntPath: 'test/fixtures/type/type_interactive',
+    targetNoPath: 'test/fixtures/target/target_missing',
+    targetInvalidPath: 'test/fixtures/target/target_invalid',
+    targetPopupPath: 'test/fixtures/target/target_popup',
+    targetInlinePath: 'test/fixtures/target/target_inline',
+    targetModalPath: 'test/fixtures/target/target_modal'
 };
 
 describe('vizlint', function () {
@@ -102,7 +112,7 @@ describe('vizlint', function () {
                 });
         });
 
-        it('should return an array of errors in resolved promise', function () {
+        it('should return an array of errors if tests fail', function () {
             var tests = [
                 function (md, p) {
                     var d = q.defer();
@@ -122,12 +132,105 @@ describe('vizlint', function () {
             ];
 
             return vizlint.lint(fixtures.missingReqMdPath, tests)
-                .then(function(result) {
+                .then(function (result) {
                     expect(result.errors.length).to.equal(6);
                     expect(result.errors[0]).to.equal('fail 1');
                     expect(result.errors[5]).to.equal('fail 6');
                 });
 
         });
+
+        it('should return an empty error list if all tests pass', function () {
+            var tests = [
+                function (md, p) {
+                    var d = q.defer();
+                    d.resolve('pass 1');
+                    return d.promise;
+                },
+                function (md, p) {
+                    var d = q.defer();
+                    d.resolve('pass 2');
+                    return d.promise;
+                }
+            ];
+
+            return vizlint.lint(fixtures.missingReqMdPath, tests)
+                .then(function (result) {
+                    expect(result.errors.length).to.equal(0);
+                });
+
+        });
+    });
+
+    describe('core-tests', function () {
+        describe('type field test', function () {
+            it('should fail if not defined', function () {
+                return vizlint.lint(fixtures.typeNoPath, [coreTests.testType])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                    });
+            });
+
+            it('should fail if invalid', function () {
+                return vizlint.lint(fixtures.typeInvalidPath, [coreTests.testType])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                    });
+            });
+
+            it('should pass if equals "static"', function () {
+                return vizlint.lint(fixtures.typeStaticPath, [coreTests.testType])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should pass if equals "interactive"', function () {
+                return vizlint.lint(fixtures.typeIntPath,  [coreTests.testType])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+        });
+
+        describe('target field test', function () {
+            it('should fail if not defined', function () {
+                return vizlint.lint(fixtures.targetNoPath, [coreTests.testTarget])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                    });
+            });
+
+            it('should fail if invalid', function () {
+                return vizlint.lint(fixtures.targetInvalidPath, [coreTests.testTarget])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                    });
+            });
+
+            it('should pass if equals "popup"', function () {
+                return vizlint.lint(fixtures.targetPopupPath, [coreTests.testTarget])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should pass if equals "inline"', function () {
+                return vizlint.lint(fixtures.targetInlinePath, [coreTests.testTarget])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should pass if equals "modal"', function () {
+                return vizlint.lint(fixtures.targetModalPath, [coreTests.testTarget])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+        });
+
     });
 });
