@@ -63,6 +63,14 @@ describe('vizlint', function () {
             return vizlint.load(fixtures.sampleBare);
         });
 
+        it('should return the base path of the package', function () {
+            return vizlint.load(fixtures.sampleBare)
+                .then(function (packagePath) {
+                    var fullPath = path.resolve(fixtures.sampleBare);
+                    expect(packagePath).to.equal(fullPath);
+                });
+        });
+
         it('should fail if visual package is not a zip file', function () {
             return vizlint.load(fixtures.invalidPackage)
                 .then(function () {
@@ -83,6 +91,17 @@ describe('vizlint', function () {
 
         it('should accept a visual package with a metadata.json file', function () {
             return vizlint.load(fixtures.sampleBarePackage);
+        });
+
+        it('should return the temporary path of the extracted package', function () {
+            return vizlint.load(fixtures.sampleBarePackage)
+                .then(function (packagePath) {
+                    var mdPath = path.resolve(packagePath, 'metadata.json'),
+                        pathStat = fs.statSync(packagePath),
+                        mdStat = fs.statSync(mdPath);
+                    expect(pathStat.isDirectory()).to.equal(true);
+                    expect(mdStat.isFile()).to.equal(true);
+                });
         });
 
         it('should notify when zip extration starts and ends', function () {
