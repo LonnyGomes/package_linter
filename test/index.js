@@ -5,6 +5,7 @@
 var expect = require('chai').expect;
 var vizlint = require('../lib');
 var coreTests = require('../lib/core-tests');
+var msg = coreTests.messages;
 var q = require('q');
 var path = require('path');
 var fs = require('fs-extra');
@@ -208,6 +209,7 @@ describe('vizlint', function () {
                 return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testType])
                     .then(function (result) {
                         expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TYPE_UNDEFINED);
                     });
             });
 
@@ -216,6 +218,7 @@ describe('vizlint', function () {
                 return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testType])
                     .then(function (result) {
                         expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TYPE_INVALID);
                     });
             });
 
@@ -247,6 +250,7 @@ describe('vizlint', function () {
                 return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTarget])
                     .then(function (result) {
                         expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_UNDEFINED);
                     });
             });
 
@@ -255,6 +259,7 @@ describe('vizlint', function () {
                 return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTarget])
                     .then(function (result) {
                         expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_INVALID);
                     });
             });
 
