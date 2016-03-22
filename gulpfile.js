@@ -18,7 +18,7 @@ gulp.task('test', function (cb) {
         });
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', ['test'], function () {
     gulp.watch(['lib/**/*.js', 'test/**'], ['test']);
 });
 
