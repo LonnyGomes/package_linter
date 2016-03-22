@@ -26,8 +26,7 @@
   "devDependencies": {
     "chai": "^3.5.0",
     "gulp": "^3.9.0",
-    "gulp-mocha": "^2.0.0",
-    "gulp-plumber": "^1.0.0"
+    "gulp-mocha": "^2.0.0"
   },
   "repository": "lonnygomes/vizlint",
   "scripts": {
