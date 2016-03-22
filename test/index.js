@@ -1,5 +1,5 @@
 /*jslint node: true */
-/*global describe, it, afterEach */
+/*global describe, it, beforeEach, afterEach */
 'use strict';
 
 var expect = require('chai').expect;
@@ -170,6 +170,10 @@ describe('vizlint', function () {
                 .then(function (result) {
                     expect(result.errors.length).to.equal(6);
                     expect(result.errors[0]).to.equal('fail 1');
+                    expect(result.errors[1]).to.equal('fail 2');
+                    expect(result.errors[2]).to.equal('fail 3');
+                    expect(result.errors[3]).to.equal('fail 4');
+                    expect(result.errors[4]).to.equal('fail 5');
                     expect(result.errors[5]).to.equal('fail 6');
                 });
 
@@ -194,6 +198,55 @@ describe('vizlint', function () {
                     expect(result.errors.length).to.equal(0);
                 });
 
+        });
+    });
+
+    describe('cleanup()', function () {
+        beforeEach(function () {
+            //remove contents of test package path
+            fs.removeSync(fixtures.tmpPackagePath);
+        });
+
+        it('should fail supplied path is not a directory', function () {
+            return vizlint.cleanup(fixtures.sampleBarePackage)
+                .then(function (result) {
+                    throw new Error('cleanup should have thrown an error if not a directory');
+                }, function (err) {
+                    //success
+                    expect(err).to.match(/^Invalid path/);
+                });
+        });
+
+        it('should fail if directory doesn\'t have a metadata.json file', function () {
+            return vizlint.cleanup(fixtures.noMdPath)
+                .then(function (result) {
+                    throw new Error('cleanup should have thrown an error if not a directory');
+                }, function (err) {
+                    //success
+                    expect(err).to.match(/^Invalid path/);
+                });
+        });
+
+        it('should return the supplied package path', function () {
+            genTestJSON({dummy: 'file'});
+            return vizlint.cleanup(fixtures.tmpPackagePath)
+                .then(function (result) {
+                    var expectedPath = path.resolve(fixtures.tmpPackagePath);
+                    expect(result).to.equal(expectedPath);
+                });
+        });
+
+        it('should remove a valid extracted package path', function () {
+            genTestJSON({dummy: 'file'});
+            return vizlint.cleanup(fixtures.tmpPackagePath)
+                .then(function (result) {
+                    var expectedPath = path.resolve(fixtures.tmpPackagePath);
+
+                    //statSync should throw an error if path doesn't exist
+                    expect(function () {
+                        fs.statSync(expectedPath);
+                    }).to.throw(Error);
+                });
         });
     });
 
