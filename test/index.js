@@ -17,7 +17,8 @@ var fixtures = {
     sampleBarePackage: 'test/fixtures/sample_bare.visual',
     invalidMd: 'test/fixtures/sample_bare/metadata.json',
     missingReqMdPath: 'test/fixtures/sample_missing',
-    tmpPackagePath: 'test/fixtures/tmp_package'
+    tmpPackagePath: 'test/fixtures/tmp_package',
+    invalidExtPackage: 'test/fixtures/sample_visual.zip'
 };
 var genTestJSON = function (obj) {
     var jsonStr = JSON.stringify(obj),
@@ -69,6 +70,15 @@ describe('vizlint', function () {
                 .then(function (packagePath) {
                     var fullPath = path.resolve(fixtures.sampleBare);
                     expect(packagePath).to.equal(fullPath);
+                });
+        });
+
+        it('should fail if package doesn\'t have .visual extension', function () {
+            return vizlint.load(fixtures.invalidExtPackage)
+                .then(function () {
+                    throw new Error('load should have thrown an error on invalid extention');
+                }, function () {
+                    //success
                 });
         });
 
