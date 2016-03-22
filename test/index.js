@@ -352,5 +352,65 @@ describe('vizlint', function () {
 
         });
 
+        describe('targetWidth field test', function () {
+            afterEach(function () {
+                //remove contents of test package path
+                fs.removeSync(fixtures.tmpPackagePath);
+            });
+
+            it('should fail if not defined', function () {
+                genTestJSON({targetWidthA: '10px'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_WIDTH_UNDEFINED);
+                    });
+            });
+
+            it('should fail if not a string', function () {
+                genTestJSON({targetWidth: 1024});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_WIDTH_INVALID);
+                    });
+            });
+
+            it('should pass if a pixel value', function () {
+                genTestJSON({targetWidth: '1024px'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should fail if not a not a whole number pixel value', function () {
+                genTestJSON({targetWidth: '1024.4px'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_WIDTH_INVALID);
+                    });
+            });
+
+            it('should pass if a percentage value', function () {
+                genTestJSON({targetWidth: '80%'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should fail if not a not a whole number percentage value', function () {
+                genTestJSON({targetWidth: '80.5%'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTargetWidth])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TARGET_WIDTH_INVALID);
+                    });
+            });
+
+        });
+
     });
 });
