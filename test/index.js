@@ -471,5 +471,41 @@ describe('vizlint', function () {
             });
         });
 
+        describe('tags field test', function () {
+            it('should pass if tags are not defined', function () {
+                genTestJSON({notags: ''});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTags])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+
+            it('should should fail if tags are a strings', function () {
+                genTestJSON({tags: 'string'});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTags])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(1);
+                        expect(result.errors[0]).to.equal(msg.ERR_TAGS_INVALID);
+                    });
+            });
+
+            it('should should fail if a tag item is no a string', function () {
+                genTestJSON({tags: ['tag1', 'tag2', 1, false]});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTags])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(2);
+                        expect(result.errors[0]).to.have.string(msg.ERR_TAG_ITEM_INVALID);
+                        expect(result.errors[1]).to.have.string(msg.ERR_TAG_ITEM_INVALID);
+                    });
+            });
+
+            it('should pass if tag items are valid', function () {
+                genTestJSON({tags: ['tag1', 'tag2', 'tag3', 'tag4']});
+                return vizlint.lint(fixtures.tmpPackagePath, [coreTests.testTags])
+                    .then(function (result) {
+                        expect(result.errors.length).to.equal(0);
+                    });
+            });
+        });
     });
 });
